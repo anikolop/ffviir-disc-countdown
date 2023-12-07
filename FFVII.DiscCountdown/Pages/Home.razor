@@ -1,0 +1,112 @@
+﻿@page "/"
+
+<div class="flex-c-t bg-img1 size2 where1 overlay1 where2 respon2" style="background-image: url('@backgroundImage');">
+    <CoolibCountdown DiscsRemaining="@discPrc" Days="days" Hours="hours" Minutes="minutes" Seconds="seconds" />
+</div>
+
+<div class="size3 flex-col-sb flex-w p-l-25 p-r-25 p-t-25 p-b-10 respon1">
+    <div class="wrap-pic1">
+        <img src="/images/ff7_rebirth_tm_rgb_B.webp" alt="LOGO">
+    </div>
+
+    <div class="p-t-50 p-b-60 p-r-90">
+        <p class="m1-txt1">FINAL FANTASY VII REBIRTH</p>
+        <p class="m1-txt1">DISC COUNTDOWN</p>
+        <p title="Exact time of release is not specified." class="m1-txt2 p-b-36">
+            RELEASES FEBRUARY 29TH 2024*
+        </p>
+        <p class="m1-txt1 p-b-16">
+            Remaining Time:
+            @if (disksRemaining?.Count > 0)
+            {
+                <button @onclick="@(() => Modal.Show<DisplayMessage>("What do you mean, \"discs\"?"))">@($" {discPrc} DISCS*")</button>
+                @* <span class="extra-time">@($"+ {totalSeconds} seconds.")</span> *@
+            }
+        </p>
+
+        <DiscsRemaining Data="disksRemaining" DiscDegree="discDegree" TotalSeconds="@totalSeconds" />
+    </div>
+
+
+    <Disclaimer />
+</div>
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+
+    private DateTime targetDate = new DateTime(2024, 2, 29);
+    private string? timeRemaining;
+    private int hours, minutes, seconds, days;
+    private List<Disc>? disksRemaining;
+    private int discDegree;
+    private int totalSeconds;
+    private double? discPrc;
+    private string[] backgroundImages = ["/images/cloud_zack_sephiroth.webp", "/images/tifa_aerith_sepiroth.webp"];
+
+    private int currentIndex = 0;
+    private string backgroundImage => backgroundImages[currentIndex];
+
+
+    protected override void OnInitialized()
+    {
+        CalculateTimeRemaining();
+        var timer = new System.Timers.Timer(1000);
+        timer.Elapsed += (sender, e) => { CalculateTimeRemaining(); };
+        timer.Start();
+    }
+
+    private void CalculateTimeRemaining()
+    {
+        disksRemaining = CalculateDisksUntilDate(targetDate);
+        StateHasChanged();
+    }
+
+    private List<Disc> CalculateDisksUntilDate(DateTime targetDate)
+    {
+        List<Disc> diskList = [];
+        DateTime currentTime = DateTime.Now;
+        double hoursPerDisk = 50;
+
+        // Calculate the hours remaining until the target date
+        TimeSpan totalTimeSpan = targetDate - DateTime.Now;
+        double remainingHours = totalTimeSpan.TotalHours;
+
+        int disksNeeded = (int)Math.Ceiling(remainingHours / hoursPerDisk);
+
+        for (int i = 0; i < disksNeeded; i++)
+        {
+            var diskTime = targetDate.AddHours(-1 * (i + 1) * hoursPerDisk);
+
+            if (!(currentTime - diskTime > TimeSpan.FromSeconds(1)))
+            {
+                Disc curDisk = new()
+                    {
+                        Index = disksNeeded - i,
+                        DateTime = diskTime
+                    };
+                diskList.Add(curDisk);
+            }
+        }
+
+        diskList = diskList.OrderBy(d => d.DateTime).ToList();
+
+        TimeSpan currentDiskTime = diskList.First().DateTime - currentTime;
+
+        if (minutes > 0 && minutes != currentDiskTime.Minutes)
+        {
+            currentIndex = (currentIndex + 1) % backgroundImages.Length;
+        };
+
+        days = (int)totalTimeSpan.Days;
+        hours = (int)totalTimeSpan.Hours;
+        minutes = totalTimeSpan.Minutes;
+        seconds = totalTimeSpan.Seconds;
+        discDegree = 360 - (int)(currentDiskTime.TotalMinutes/8.3333333);
+        totalSeconds = (int)currentDiskTime.TotalSeconds;
+        
+        discPrc = disksRemaining?.Count + Math.Round(totalSeconds / (hoursPerDisk * 3600), 5);
+        return diskList;
+
+    }
+
+}
+

@@ -1,0 +1,47 @@
+﻿<div class="wsize3 flex-w flex-c-m cd100 js-tilt">
+    @if (DiscsRemaining > 0)
+    {
+        <div class="flex-col-c-m size6 bor2 m-l-10 m-r-10 m-t-15" @onclick="@(() => Modal.Show<DisplayMessage>("What do you mean, \"discs\"?"))">
+            <span class="l2-txt1 p-b-9 discs">@Math.Round(DiscsRemaining ?? 0, 2)</span>
+            <span class="s2-txt4">Discs*</span>
+        </div>
+    }
+    <span class="s2-txt4">Or</span>
+    @if (Days > 0)
+    {
+        <div class="flex-col-c-m size6 bor2 m-l-10 m-r-10 m-t-15">
+            <span class="l2-txt1 p-b-9 hours">@Days</span>
+            <span class="s2-txt4">Days</span>
+        </div>
+    }
+
+    @if (Hours > 0)
+    {
+        <div class="flex-col-c-m size6 bor2 m-l-10 m-r-10 m-t-15">
+            <span class="l2-txt1 p-b-9 hours">@Hours</span>
+            <span class="s2-txt4">Hours</span>
+        </div>
+    }
+
+    @if (Minutes > 0)
+    {
+        <div class="flex-col-c-m size6 bor2 m-l-10 m-r-10 m-t-15">
+            <span class="l2-txt1 p-b-9 minutes">@Minutes</span>
+            <span class="s2-txt4">Minutes</span>
+        </div>
+    }
+
+    <div class="flex-col-c-m size6 bor2 m-l-10 m-r-10 m-t-15">
+        <span class="l2-txt1 p-b-9 seconds">@Seconds</span>
+        <span class="s2-txt4">Seconds</span>
+    </div>
+</div>
+@code {
+    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    [Parameter] public double? DiscsRemaining { get; set; }
+    [Parameter] public int Days { get; set; }
+    [Parameter] public int Hours { get; set; }
+    [Parameter] public int Minutes { get; set; }
+    [Parameter] public int Seconds { get; set; }
+
+}

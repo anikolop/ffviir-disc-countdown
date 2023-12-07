@@ -1,0 +1,14 @@
+﻿<div>
+    <p>@Message</p>
+    <p>This is based on <a href="https://clips.twitch.tv/ImportantCoyPeppermintKippa-UoYudqLJI0ceb10w" target="_blank">a 
+        joke by streamer Maximilian Dood</a>, using a 100 hours estimate said <a href="https://twitter.com/finalfantasyvii/status/1702436739434820090" target="_blank">in this tweet</a>. 
+        It was previously announced that the game will be released on two discs, so a "disc" is roughly 50 hours.</p>
+</div>
+
+@code {
+    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [Parameter] public string? Message { get; set; }
+
+    private async Task Close() => await BlazoredModal.CloseAsync();
+}

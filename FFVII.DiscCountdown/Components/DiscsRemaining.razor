@@ -1,0 +1,22 @@
+﻿@if (Data?.Count > 0)
+{
+    <div class="disc-grid">
+        <div class="disc-container">
+            <img class="disk-icon" src="/images/ffviir-disc.webp" alt="@($"disk-1")" title="@($"{TotalSeconds}sec. remaining")" />
+            <div class="disc-overlay" title="@($"{TotalSeconds}sec. remaining")" style="background: conic-gradient(#a72a2c 0 @($"{DiscDegree}deg"), transparent 0 360deg);"></div>
+        </div>
+        @foreach (Disc disk in Data ?? [])
+        {
+            <div class="disc-container" >
+                <img class="disk-icon" src="/images/ffviir-disc.webp" alt="@($"disk{disk.Index}")" title="@disk.DateTime.ToString("G")" />
+            </div>
+
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public List<Disc>? Data { get; set; }
+    [Parameter] public int DiscDegree { get; set; }
+    [Parameter] public int TotalSeconds { get; set; }
+}
