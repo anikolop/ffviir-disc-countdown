@@ -69,10 +69,10 @@
         DateTime currentDate = DateTime.Now;
         // Define the start and end dates for the Christmas range
         DateTime christmasStartDate = new DateTime(currentDate.Year, 12, 15);
-        DateTime christmasEndDate = new DateTime(currentDate.Year, 1, 03);
+        DateTime christmasEndDate = new DateTime(currentDate.Year, 1, 05);
 
         // Check if the current date is between Christmas Eve and Boxing Day
-        return currentDate >= christmasStartDate && currentDate <= christmasEndDate;
+        return currentDate >= christmasStartDate || currentDate <= christmasEndDate;
     }
 
     private List<Disc> CalculateDisksUntilDate(DateTime targetDate)
