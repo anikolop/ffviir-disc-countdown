@@ -19,7 +19,7 @@
             Remaining Time:
             @if (disksRemaining?.Count > 0)
             {
-                <button @onclick="@(() => Modal.Show<DisplayMessage>("What do you mean, \"discs\"?"))">@($" {discPrc} DISCS*")</button>
+                <button @onclick="@(() => Modal.Show<DisplayMessage>("What do you mean, \"discs\"?"))">@($"{discPrc:0.00000} DISCS*")</button>
                 @* <span class="extra-time">@($"+ {totalSeconds} seconds.")</span> *@
             }
         </p>
