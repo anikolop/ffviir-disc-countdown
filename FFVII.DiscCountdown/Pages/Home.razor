@@ -4,8 +4,8 @@
 {
     <Snowflakes/>
 }
-<div class="flex-c-t bg-img1 size2 where1 overlay1 where2 respon2" style="background-image: url('@backgroundImage');">
-    <CoolibCountdown DiscsRemaining="@discPrc" Days="days" Hours="hours" Minutes="minutes" Seconds="seconds" />
+<div class="flex-c-t bg-img1 size2 where1 overlay1 where2 respon2" style="background-image: url('@BackgroundImage');">
+    <CoolibCountdown DiscsRemaining="@_discPrc" Days="_days" Hours="_hours" Minutes="_minutes" Seconds="_seconds"/>
 </div>
 
 <div class="size3 flex-col-sb flex-w p-l-25 p-r-25 p-t-25 p-b-10 respon1">
@@ -21,34 +21,34 @@
         </p>
         <p class="m1-txt1 p-b-16">
             Remaining Time:
-            @if (disksRemaining?.Count > 0)
+            @if (_disksRemaining?.Count > 0)
             {
-                <button @onclick="@(() => Modal.Show<DisplayMessage>("What do you mean, \"discs\"?"))">@($"{discPrc:0.00000} DISCS*")</button>
+                <button @onclick="@(() => Modal.Show<DisplayMessage>("What do you mean, \"discs\"?"))">@($"{_discPrc:0.00000} DISCS*")</button>
                 @* <span class="extra-time">@($"+ {totalSeconds} seconds.")</span> *@
             }
         </p>
 
-        <DiscsRemaining Data="disksRemaining" DiscDegree="discDegree" TotalSeconds="@totalSeconds" />
+        <DiscsRemaining Data="_disksRemaining" DiscDegree="_discDegree" TotalSeconds="@_totalSeconds"/>
     </div>
 
 
-    <Disclaimer />
+    <Disclaimer/>
 </div>
+
 @code {
     [CascadingParameter] public IModalService Modal { get; set; } = default!;
 
-    private DateTime targetDate = new DateTime(2024, 2, 29);
-    private string? timeRemaining;
-    private int hours, minutes, seconds, days;
-    private List<Disc>? disksRemaining;
-    private int discDegree;
-    private int totalSeconds;
-    private double? discPrc;
-    private string[] backgroundImages = ["/images/cloud_zack_sephiroth.webp", "/images/tifa_aerith_sepiroth.webp", "/images/FFVII_REBIRTH_December_Keyart_4x5.webp"];
+    private DateTime _targetDate = new DateTime(2024, 2, 29);
 
-    private int currentIndex = 0;
-    private string backgroundImage => backgroundImages[currentIndex];
+    private int _hours, _minutes, _seconds, _days;
+    private List<Disc>? _disksRemaining;
+    private int _discDegree;
+    private int _totalSeconds;
+    private double? _discPrc;
+    private string[] _backgroundImages = ["/images/cloud_zack_sephiroth.webp", "/images/tifa_aerith_sepiroth.webp", "/images/FFVII_REBIRTH_December_Keyart_4x5.webp"];
 
+    private int _currentIndex = 0;
+    private string BackgroundImage => _backgroundImages[_currentIndex];
 
     protected override void OnInitialized()
     {
@@ -60,10 +60,10 @@
 
     private void CalculateTimeRemaining()
     {
-        disksRemaining = CalculateDisksUntilDate(targetDate);
+        _disksRemaining = CalculateDisksUntilDate(_targetDate);
         StateHasChanged();
     }
-    
+
     private bool IsInRangeOfChristmas()
     {
         DateTime currentDate = DateTime.Now;
@@ -89,39 +89,37 @@
 
         for (int i = 0; i < disksNeeded; i++)
         {
-            var diskTime = targetDate.AddHours(-1 * (i + 1) * hoursPerDisk);
+            DateTime diskTime = targetDate.AddHours(-1 * (i + 1) * hoursPerDisk);
 
-            if (!(currentTime - diskTime > TimeSpan.FromSeconds(1)))
+            if (currentTime - diskTime > TimeSpan.FromSeconds(1)) continue;
+            Disc curDisk = new()
             {
-                Disc curDisk = new()
-                    {
-                        Index = disksNeeded - i,
-                        DateTime = diskTime
-                    };
-                diskList.Add(curDisk);
-            }
+                Index = disksNeeded - i,
+                DateTime = diskTime
+            };
+            diskList.Add(curDisk);
         }
 
         diskList = diskList.OrderBy(d => d.DateTime).ToList();
 
         TimeSpan currentDiskTime = diskList.First().DateTime - currentTime;
 
-        if (minutes > 0 && minutes != currentDiskTime.Minutes)
+        if (_minutes > 0 && _minutes != currentDiskTime.Minutes)
         {
-            currentIndex = (currentIndex + 1) % backgroundImages.Length;
-        };
+            _currentIndex = (_currentIndex + 1) % _backgroundImages.Length;
+        }
 
-        days = (int)totalTimeSpan.Days;
-        hours = (int)totalTimeSpan.Hours;
-        minutes = totalTimeSpan.Minutes;
-        seconds = totalTimeSpan.Seconds;
-        discDegree = 360 - (int)(currentDiskTime.TotalMinutes/8.3333333);
-        totalSeconds = (int)currentDiskTime.TotalSeconds;
-        
-        discPrc = disksRemaining?.Count + Math.Round(totalSeconds / (hoursPerDisk * 3600), 5);
+        ;
+
+        _days = (int)totalTimeSpan.Days;
+        _hours = (int)totalTimeSpan.Hours;
+        _minutes = totalTimeSpan.Minutes;
+        _seconds = totalTimeSpan.Seconds;
+        _discDegree = 360 - (int)(currentDiskTime.TotalMinutes / 8.3333333);
+        _totalSeconds = (int)currentDiskTime.TotalSeconds;
+
+        _discPrc = _disksRemaining?.Count + Math.Round(_totalSeconds / (hoursPerDisk * 3600), 5);
         return diskList;
-
     }
 
 }
-

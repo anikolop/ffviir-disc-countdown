@@ -302,6 +302,10 @@ input.input100 {
     height: 155px;
 }
 
+.size8 {
+    width: 75px;
+    height: 75px;
+}
 /*//////////////////////////////////////////////////////////////////
 [ Width ]*/
 .wsize1 {
@@ -949,6 +953,11 @@ input.input100 {
     height: 49px;
     border-radius: 50%;
     z-index: 10;
+}
+
+.disc-grid-widget {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
 }
 
 .flex-w > p {
