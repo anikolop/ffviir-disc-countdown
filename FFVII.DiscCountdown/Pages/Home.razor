@@ -2,10 +2,10 @@
 
 @if (IsInRangeOfChristmas())
 {
-    <Snowflakes/>
+    <Snowflakes />
 }
 <div class="flex-c-t bg-img1 size2 where1 overlay1 where2 respon2" style="background-image: url('@BackgroundImage');">
-    <CoolibCountdown DiscsRemaining="@_discPrc" Days="_days" Hours="_hours" Minutes="_minutes" Seconds="_seconds"/>
+    <CoolibCountdown DiscsRemaining="@_discPrc" Days="_days" Hours="_hours" Minutes="_minutes" Seconds="_seconds" />
 </div>
 
 <div class="size3 flex-col-sb flex-w p-l-25 p-r-25 p-t-25 p-b-10 respon1">
@@ -19,20 +19,23 @@
         <p title="Exact time of release is not specified." class="m1-txt2 p-b-36">
             RELEASES FEBRUARY 29TH 2024*
         </p>
-        <p class="m1-txt1 p-b-16">
-            Remaining Time:
-            @if (_disksRemaining?.Count > 0)
-            {
-                <button @onclick="@(() => Modal.Show<DisplayMessage>("What do you mean, \"discs\"?"))">@($"{_discPrc:0.00000} DISCS*")</button>
-                @* <span class="extra-time">@($"+ {totalSeconds} seconds.")</span> *@
-            }
-        </p>
+        @if (_disksRemaining?.Count > 0)
+        {
+            <p class="m1-txt1 p-b-16">
+                Remaining Time:
+                @if (_disksRemaining?.Count > 0)
+                {
+                    <button @onclick="@(() => Modal.Show<DisplayMessage>("What do you mean, \"discs\"?"))">@($"{_discPrc:0.00000} DISCS*")</button>
+                    @* <span class="extra-time">@($"+ {totalSeconds} seconds.")</span> *@
+                }
+            </p>
+        }
 
-        <DiscsRemaining Data="_disksRemaining" DiscDegree="_discDegree" TotalSeconds="@_totalSeconds"/>
+        <DiscsRemaining Data="_disksRemaining" DiscDegree="_discDegree" TotalSeconds="@_totalSeconds" />
     </div>
 
 
-    <Disclaimer/>
+    <Disclaimer />
 </div>
 
 @code {
@@ -75,7 +78,7 @@
         return currentDate >= christmasStartDate || currentDate <= christmasEndDate;
     }
 
-    private List<Disc> CalculateDisksUntilDate(DateTime targetDate)
+    private List<Disc>? CalculateDisksUntilDate(DateTime targetDate)
     {
         List<Disc> diskList = [];
         DateTime currentTime = DateTime.Now;
@@ -86,21 +89,23 @@
         double remainingHours = totalTimeSpan.TotalHours;
 
         int disksNeeded = (int)Math.Ceiling(remainingHours / hoursPerDisk);
-
+        if (disksNeeded <= 0) return null;
+        diskList.Add(new Disc { Index = 0, DateTime = targetDate });
         for (int i = 0; i < disksNeeded; i++)
         {
             DateTime diskTime = targetDate.AddHours(-1 * (i + 1) * hoursPerDisk);
-
+            TimeSpan difft = currentTime - diskTime;
             if (currentTime - diskTime > TimeSpan.FromSeconds(1)) continue;
             Disc curDisk = new()
-            {
-                Index = disksNeeded - i,
-                DateTime = diskTime
-            };
+                {
+                    Index = disksNeeded - i,
+                    DateTime = diskTime
+                };
             diskList.Add(curDisk);
         }
 
         diskList = diskList.OrderBy(d => d.DateTime).ToList();
+
 
         TimeSpan currentDiskTime = diskList.First().DateTime - currentTime;
 
@@ -109,7 +114,7 @@
             _currentIndex = (_currentIndex + 1) % _backgroundImages.Length;
         }
 
-        ;
+
 
         _days = (int)totalTimeSpan.Days;
         _hours = (int)totalTimeSpan.Hours;
@@ -118,7 +123,7 @@
         _discDegree = 360 - (int)(currentDiskTime.TotalMinutes / 8.3333333);
         _totalSeconds = (int)currentDiskTime.TotalSeconds;
 
-        _discPrc = _disksRemaining?.Count + Math.Round(_totalSeconds / (hoursPerDisk * 3600), 5);
+        _discPrc = Math.Round(_totalSeconds / (hoursPerDisk * 3600), 5);
         return diskList;
     }
 
