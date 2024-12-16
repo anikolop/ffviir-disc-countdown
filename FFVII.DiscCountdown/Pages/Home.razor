@@ -1,11 +1,12 @@
 ﻿@page "/"
+@using System.Timers
 
 @if (IsInRangeOfChristmas())
 {
-    <Snowflakes />
+    <Snowflakes/>
 }
-<div class="flex-c-t bg-img1 size2 where1 overlay1 where2 respon2" style="background-image: url('@BackgroundImage');">
-    <CoolibCountdown DiscsRemaining="@_discPrc" Days="_days" Hours="_hours" Minutes="_minutes" Seconds="_seconds" />
+<div class="flex-c-t bg-img1 size2 where1 overlay1 where2 response2" style="background-image: url('@BackgroundImage');">
+    <CoolibCountdown DiscsRemaining="@_discPrc" Days="_days" Hours="_hours" Minutes="_minutes" Seconds="_seconds"/>
 </div>
 
 <div class="size3 flex-col-sb flex-w p-l-25 p-r-25 p-t-25 p-b-10 respon1">
@@ -16,8 +17,10 @@
     <div class="p-t-50 p-b-60 p-r-90">
         <p class="m1-txt1">FINAL FANTASY VII REBIRTH</p>
         <p class="m1-txt1">DISC COUNTDOWN</p>
-        <p title="Exact time of release is not specified." class="m1-txt2 p-b-36">
-            RELEASES FEBRUARY 29TH 2024*
+        <p class="m1-txt2 p-b-36">RELEASE DATES:</p>
+        <p class="m1-txt1">
+            - FEBRUARY 29TH 2024 FOR THE PS5 <span>&#10003;</span><br>
+            - JANUARY 25TH 2025 FOR THE PC
         </p>
         @if (_disksRemaining?.Count > 0)
         {
@@ -25,39 +28,39 @@
                 Remaining Time:
                 @if (_disksRemaining?.Count > 0)
                 {
-                    <button @onclick="@(() => Modal.Show<DisplayMessage>("What do you mean, \"discs\"?"))">@($"{_discPrc:0.00000} DISCS*")</button>
+                    <button @onclick="@(() => Modal?.Show<DisplayMessage>("What do you mean, \"discs\"?"))">@($"{_discPrc:0.00000} DISCS*")</button>
                     @* <span class="extra-time">@($"+ {totalSeconds} seconds.")</span> *@
                 }
             </p>
         }
 
-        <DiscsRemaining Data="_disksRemaining" DiscDegree="_discDegree" TotalSeconds="@_totalSeconds" />
+        <DiscsRemaining Data="_disksRemaining" DiscDegree="_discDegree" TotalSeconds="@_totalSeconds"/>
     </div>
 
 
-    <Disclaimer />
+    <Disclaimer/>
 </div>
 
 @code {
-    [CascadingParameter] public IModalService Modal { get; set; } = default!;
+    [CascadingParameter] public IModalService? Modal { get; set; }
 
-    private DateTime _targetDate = new DateTime(2024, 2, 29);
+    private readonly DateTime _targetDate = new DateTime(2025, 1, 25);
 
     private int _hours, _minutes, _seconds, _days;
     private List<Disc>? _disksRemaining;
     private int _discDegree;
     private int _totalSeconds;
     private double? _discPrc;
-    private string[] _backgroundImages = ["/images/cloud_zack_sephiroth.webp", "/images/tifa_aerith_sepiroth.webp", "/images/FFVII_REBIRTH_December_Keyart_4x5.webp"];
+    private readonly string[] _backgroundImages = ["/images/cloud_zack_sephiroth.webp", "/images/tifa_aerith_sepiroth.webp", "/images/FFVII_REBIRTH_December_Keyart_4x5.webp"];
 
-    private int _currentIndex = 0;
+    private int _currentIndex;
     private string BackgroundImage => _backgroundImages[_currentIndex];
 
     protected override void OnInitialized()
     {
         CalculateTimeRemaining();
-        var timer = new System.Timers.Timer(1000);
-        timer.Elapsed += (sender, e) => { CalculateTimeRemaining(); };
+        Timer timer = new(1000);
+        timer.Elapsed += (_, _) => { CalculateTimeRemaining(); };
         timer.Start();
     }
 
@@ -67,7 +70,7 @@
         StateHasChanged();
     }
 
-    private bool IsInRangeOfChristmas()
+    private static bool IsInRangeOfChristmas()
     {
         DateTime currentDate = DateTime.Now;
         // Define the start and end dates for the Christmas range
@@ -82,7 +85,7 @@
     {
         List<Disc> diskList = [];
         DateTime currentTime = DateTime.Now;
-        double hoursPerDisk = 50;
+        const double hoursPerDisk = 50;
 
         // Calculate the hours remaining until the target date
         TimeSpan totalTimeSpan = targetDate - DateTime.Now;
@@ -94,13 +97,13 @@
         for (int i = 0; i < disksNeeded; i++)
         {
             DateTime diskTime = targetDate.AddHours(-1 * (i + 1) * hoursPerDisk);
-            TimeSpan difft = currentTime - diskTime;
-            if (currentTime - diskTime > TimeSpan.FromSeconds(1)) continue;
+            TimeSpan difference = currentTime - diskTime;
+            if (difference > TimeSpan.FromSeconds(1)) continue;
             Disc curDisk = new()
-                {
-                    Index = disksNeeded - i,
-                    DateTime = diskTime
-                };
+            {
+                Index = disksNeeded - i,
+                DateTime = diskTime
+            };
             diskList.Add(curDisk);
         }
 
@@ -115,15 +118,19 @@
         }
 
 
-
-        _days = (int)totalTimeSpan.Days;
-        _hours = (int)totalTimeSpan.Hours;
+        _days = totalTimeSpan.Days;
+        _hours = totalTimeSpan.Hours;
         _minutes = totalTimeSpan.Minutes;
         _seconds = totalTimeSpan.Seconds;
         _discDegree = 360 - (int)(currentDiskTime.TotalMinutes / 8.3333333);
         _totalSeconds = (int)currentDiskTime.TotalSeconds;
 
         _discPrc = Math.Round(_totalSeconds / (hoursPerDisk * 3600), 5);
+        if (diskList.Count > 1)
+        {
+            _discPrc += diskList.Count;
+        }
+
         return diskList;
     }
 

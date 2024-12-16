@@ -694,14 +694,14 @@ input.input100 {
 
 
     /*---------------------------------------------*/
-    .respon2 {
+    .response2 {
         position: relative;
         width: 100%;
         padding-left: 15px;
         padding-right: 15px;
     }
 
-        .respon2::after {
+        .response2::after {
             top: 100%;
             right: 0;
             width: 100%;
