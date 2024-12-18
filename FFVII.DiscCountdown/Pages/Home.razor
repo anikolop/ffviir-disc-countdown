@@ -20,7 +20,7 @@
         <p class="m1-txt2 p-b-36">RELEASE DATES:</p>
         <p class="m1-txt1">
             - FEBRUARY 29TH 2024 FOR THE PS5 <span>&#10003;</span><br>
-            - JANUARY 25TH 2025 FOR THE PC
+            - JANUARY 23TH 2025 FOR THE PC
         </p>
         @if (_disksRemaining?.Count > 0)
         {
@@ -44,7 +44,7 @@
 @code {
     [CascadingParameter] public IModalService? Modal { get; set; }
 
-    private readonly DateTime _targetDate = new DateTime(2025, 1, 25);
+    private readonly DateTime _targetDate = new DateTime(2025, 1, 23);
 
     private int _hours, _minutes, _seconds, _days;
     private List<Disc>? _disksRemaining;
